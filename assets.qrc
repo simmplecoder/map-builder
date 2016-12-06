@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/icons">
+        <file>assets/circle.ico</file>
+        <file>assets/rectangle.ico</file>
+    </qresource>
+</RCC>
