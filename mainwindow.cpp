@@ -25,10 +25,11 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->createShapeButton, SIGNAL(released()), this, SLOT(onCreateClicked()));
     connect(ui->resizeMapButton, SIGNAL(released()), this, SLOT(onMapResizeClicked()));
     connect(ui->generateButton, SIGNAL(released()), this, SLOT(onGenerateClicked()));
+    connect(ui->updateShapeButton, SIGNAL(released()), this, SLOT(onUpdateShapeClicked()));
 
 
-    QIcon rectangleIcon("./assets/rectangle.png");
-    QIcon circleIcon("./assets/circle.png");
+    QIcon rectangleIcon("./assets/rectangle-128.ico");
+    QIcon circleIcon("./assets/circle-128.ico");
 
     QListWidgetItem* item = new QListWidgetItem(rectangleIcon, "Rectangle", nullptr, Shapes::Rectangle);
     ui->ShapesList->addItem(item);
@@ -65,14 +66,18 @@ void MainWindow::onSelectedShapeChanged(QListWidgetItem *current, QListWidgetIte
         ui->width->setText("Radius");
         ui->height->setText("Unused");
         ui->heightEdit->setDisabled(true);
+//        ui->height->hide();
+//        ui->heightEdit->hide();
     }
     else
     {
         ui->leftX->setText("Left X");
         ui->upperY->setText("Upper Y");
         ui->width->setText("Width");
-        ui->height->setText("Height");
         ui->heightEdit->setDisabled(false);
+//        ui->height->show();
+//        ui->heightEdit->show();
+        ui->height->setText("Height");
     }
 }
 
@@ -115,7 +120,8 @@ void MainWindow::onGenerateClicked()
         auto rect = items[i].shape->boundingRect();
         if (items[i].isRect)
         {
-            stream << rect.width() << ' ' << rect.height() << ' ';
+//            stream << rect.width() << ' ' << rect.height() << ' ';
+            stream << items[i].width << ' ' << items[i].height << ' ';
         }
         else
         {
@@ -140,7 +146,7 @@ void MainWindow::createRectangle(int x, int y, int w, int h, const QString& str)
 
     scene->addItem(callableRect);
 
-    const ShapeData shapeData(callableRect, str, true, x, y);
+    const ShapeData shapeData(callableRect, str, true, x, y, w, h);
     items.push_back(shapeData);
 }
 
@@ -159,7 +165,7 @@ void MainWindow::createCircle(int x, int y, int radius, const QString& str)
 
     scene->addItem(callableCircle);
 
-    const ShapeData shapeData(callableCircle, str, false, x, y);
+    const ShapeData shapeData(callableCircle, str, false, x, y, radius, radius);
     items.push_back(shapeData);
 }
 
@@ -196,9 +202,10 @@ void MainWindow::updateEdits(QAbstractGraphicsShapeItem* item)
     ui->upperYEdit->setText(coordinate);
 
 
-    auto boundingRectReal = item->sceneBoundingRect();
-    auto boundingRect = boundingRectReal.toRect();
-    ui->widthEdit->setText(QString::number(boundingRect.width()));
+//    auto boundingRectReal = item->sceneBoundingRect();
+//    auto boundingRect = boundingRectReal.toRect();
+//    ui->widthEdit->setText(QString::number(boundingRect.width()));
+    ui->widthEdit->setText(QString::number(items[currentShapeIndex].width));
     if (!items[currentShapeIndex].isRect)
     {
         ui->heightEdit->setDisabled(true);
@@ -206,27 +213,18 @@ void MainWindow::updateEdits(QAbstractGraphicsShapeItem* item)
     else
     {
         ui->heightEdit->setDisabled(false);
-        ui->heightEdit->setText(QString::number(boundingRect.height()));
+//        ui->heightEdit->setText(QString::number(boundingRect.height()));
+        ui->heightEdit->setText(QString::number(items[currentShapeIndex].height));
     }
 }
 
 void MainWindow::onUpdateShapeClicked()
 {
-//    scene->removeItem(items[currentShapeIndex].shape);
-//    delete items[currentShapeIndex].shape;
-//    const int i = currentShapeIndex;
-//    if (items[i].isRect)
-//    {
-//        auto posReal = items[i].shape->pos();
-//        auto pos = posReal.toPoint();
-//        auto boundingRectReal = items[i].shape->boundingRect();
-//        auto boundingRect = boundingRectReal.toRect();
+    scene->removeItem(items[currentShapeIndex].shape);
+    delete items[currentShapeIndex].shape;
 
-//        createRectangle(pos.x(), pos.y(), boundingRect.width(), boundingRect.height(), items[i].name);
-//    }
-//    items.remove(currentShapeIndex);
-//    currentShapeIndex = items.size() - 1;
-
+    items.remove(currentShapeIndex);
+    onCreateClicked();
 }
 
 void MainWindow::deleteItem(QAbstractGraphicsShapeItem *item)
@@ -242,7 +240,7 @@ void MainWindow::deleteItem(QAbstractGraphicsShapeItem *item)
         }
     }
 
-    currentShapeIndex = -1;
+    currentShapeIndex = items.size() - 1;
     ui->updateShapeButton->setDisabled(true);
 }
 

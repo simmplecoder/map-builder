@@ -20,8 +20,8 @@ public:
                              QString rectName,
                              MainWindow* p);
 
-    //virtual void mousePressEvent(QGraphicsSceneMouseEvent* event) override;
-//    virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent* event) override;
+    virtual void mousePressEvent(QGraphicsSceneMouseEvent* event) override;
+    virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent* event) override;
     virtual QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
 
     QString name() const;

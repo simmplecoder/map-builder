@@ -11,29 +11,28 @@ CallableGraphicsRectItem::CallableGraphicsRectItem(
     ptr(p)
 {}
 
-//void CallableGraphicsRectItem::mousePressEvent(QGraphicsSceneMouseEvent* event)
-//{
-//    if (!isPressed)
-//    {
-//        ptr->updateEdits(this);
-//        isPressed = true;
-//    }
-//    QGraphicsRectItem::mousePressEvent(event);
-//}
+void CallableGraphicsRectItem::mousePressEvent(QGraphicsSceneMouseEvent* event)
+{
+    if (!isPressed)
+    {
+        ptr->updateEdits(this);
+        isPressed = true;
+    }
+    QGraphicsRectItem::mousePressEvent(event);
+}
 
-//void CallableGraphicsRectItem::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
-//{
-//    auto pressedButton = event->button();
-//    if (pressedButton == Qt::MouseButton::RightButton)
-//    {
-//        ptr->deleteItem(this);
-//        return;
-//    }
+void CallableGraphicsRectItem::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
+{
+    auto pressedButton = event->button();
+    if (pressedButton == Qt::MouseButton::RightButton)
+    {
+        ptr->deleteItem(this);
+        return;
+    }
 
-//    QGraphicsRectItem::mouseReleaseEvent(event);
-//    ptr->updateEdits(this);
-//    isPressed = false;
-//}
+    isPressed = false;
+    QGraphicsRectItem::mouseReleaseEvent(event);
+}
 
 QVariant CallableGraphicsRectItem::itemChange(GraphicsItemChange change, const QVariant &value)
 {

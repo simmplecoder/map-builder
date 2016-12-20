@@ -257,7 +257,7 @@
             </sizepolicy>
            </property>
            <property name="text">
-            <string>Right X</string>
+            <string>Width</string>
            </property>
            <property name="alignment">
             <set>Qt::AlignCenter</set>
@@ -296,7 +296,7 @@
             </sizepolicy>
            </property>
            <property name="text">
-            <string>Bottom Y</string>
+            <string>Height</string>
            </property>
            <property name="alignment">
             <set>Qt::AlignCenter</set>

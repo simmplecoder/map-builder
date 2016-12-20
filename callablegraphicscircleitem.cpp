@@ -12,30 +12,29 @@ CallableGraphicsCircleItem::CallableGraphicsCircleItem(
     isPressed(false)
 {}
 
-//void CallableGraphicsCircleItem::mousePressEvent(QGraphicsSceneMouseEvent* event)
-//{
-//    if (!isPressed)
-//    {
-//        ptr->updateEdits(this);
-//        isPressed = true;
-//    }
-//    QGraphicsEllipseItem::mousePressEvent(event);
-//}
+void CallableGraphicsCircleItem::mousePressEvent(QGraphicsSceneMouseEvent* event)
+{
+    if (!isPressed)
+    {
+        ptr->updateEdits(this);
+        isPressed = true;
+    }
+    QGraphicsEllipseItem::mousePressEvent(event);
+}
 
-//void CallableGraphicsCircleItem::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
-//{
-//    auto pressedButton = event->button();
+void CallableGraphicsCircleItem::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
+{
+    auto pressedButton = event->button();
 
-//    if (pressedButton == Qt::MouseButton::RightButton)
-//    {
-//        ptr->deleteItem(this);
-//        return;
-//    }
+    if (pressedButton == Qt::MouseButton::RightButton)
+    {
+        ptr->deleteItem(this);
+        return;
+    }
 
-//    QGraphicsEllipseItem::mouseReleaseEvent(event);
-//    ptr->updateEdits(this);
-//    isPressed = false;
-//}
+    isPressed = false;
+    QGraphicsEllipseItem::mouseReleaseEvent(event);
+}
 
 QVariant CallableGraphicsCircleItem::itemChange(GraphicsItemChange change, const QVariant &value)
 {
