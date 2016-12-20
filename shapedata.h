@@ -6,17 +6,21 @@
 
 struct ShapeData
 {
-    ShapeData(QAbstractGraphicsShapeItem* shape_, bool is_rect_, const QString& name_):
+    ShapeData() = default;
+    ShapeData(QAbstractGraphicsShapeItem* shape_, QString shapeName, bool isRect_,
+              int x_, int y_):
         shape(shape_),
-        is_rect(is_rect_),
-        name(name_)
+        name(shapeName),
+        isRect(isRect_),
+        x(x_),
+        y(y_)
     {}
 
-    ShapeData() = default;
-
     QAbstractGraphicsShapeItem* shape;
-    bool is_rect;
     QString name;
+    bool isRect;
+    int x;
+    int y;
 };
 
 #endif // SHAPEDATA_H

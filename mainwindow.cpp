@@ -2,15 +2,14 @@
 #include "ui_mainwindow.h"
 #include <QListWidgetItem>
 #include <QIcon>
-#include <iostream>
-#include <QPixmap>
-#include <QPainter>
 #include <QRect>
-#include <QPixmap>
 #include <QGraphicsScene>
 #include <QFile>
 #include <QTextStream>
 #include <QDebug>
+#include <functional>
+#include "callbackgraphicsrectitem.h"
+#include "callablegraphicscircleitem.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -27,8 +26,9 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->resizeMapButton, SIGNAL(released()), this, SLOT(onMapResizeClicked()));
     connect(ui->generateButton, SIGNAL(released()), this, SLOT(onGenerateClicked()));
 
-    QIcon rectangleIcon("./assets/rectangle.ico");
-    QIcon circleIcon("./assets/circle.ico");
+
+    QIcon rectangleIcon("./assets/rectangle.png");
+    QIcon circleIcon("./assets/circle.png");
 
     QListWidgetItem* item = new QListWidgetItem(rectangleIcon, "Rectangle", nullptr, Shapes::Rectangle);
     ui->ShapesList->addItem(item);
@@ -37,8 +37,17 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->ShapesList->addItem(item);
 
     scene = new QGraphicsScene(ui->mapBg);
-    scene->setSceneRect(0, 0, 1024, 768);
+    auto mapSize = ui->mapBg->size();
+
+    scene->setSceneRect(0, 0, mapSize.width() - 20, mapSize.height() - 20);
     ui->graphicsView->setScene(scene);
+    //ui->graphicsView->setSceneRect(0, 0, mapSize.width() - 20, mapSize.height() - 20);
+//    ui->graphicsView->setBackgroundBrush(QBrush(Qt::black));
+
+    qDebug() << ui->graphicsView->scene()->width()
+             << ' ' << ui->graphicsView->scene()->height();
+
+    ui->updateShapeButton->setDisabled(true);
 }
 
 MainWindow::~MainWindow()
@@ -83,6 +92,9 @@ void MainWindow::onCreateClicked()
         int radius = ui->widthEdit->text().toInt();
         createCircle(x, y, radius, name);
     }
+
+    currentShapeIndex = items.size() - 1;
+    ui->updateShapeButton->setDisabled(false);
 }
 
 void MainWindow::onGenerateClicked()
@@ -99,17 +111,17 @@ void MainWindow::onGenerateClicked()
     for (int i = 0; i < items.size(); ++i)
     {
         auto pos = items[i].shape->pos();
-        stream << pos.x() << ' ' << pos.y() << ' ';
+        stream << items[i].x + pos.x() << ' ' << items[i].y + pos.y() << ' ';
         auto rect = items[i].shape->boundingRect();
-        if (items[i].is_rect)
+        if (items[i].isRect)
         {
             stream << rect.width() << ' ' << rect.height() << ' ';
-            stream << items[i].name << '\n';
         }
         else
         {
-            stream << rect.width() << ' ' << items[i].name << '\n';
+            stream << rect.width() << ' ';
         }
+        stream << items[i].name << '\n';
     }
 }
 
@@ -119,10 +131,17 @@ void MainWindow::createRectangle(int x, int y, int w, int h, const QString& str)
     int green = dist(twister);
     int blue = dist(twister);
 
-    QGraphicsRectItem* rect = scene->addRect(x, y, w, h, QPen(Qt::black), QBrush(QColor(red, green, blue)));
-    rect->setFlag(QGraphicsItem::ItemIsMovable);
-    items.push_back({rect, true, str});
-    shapeTypes.push_back(0);
+    auto callableRect = new CallableGraphicsRectItem(x, y, w, h, str, this);
+
+    callableRect->setBrush(QBrush(QColor(red, green, blue)));
+    //callableRect->setPen(QPen(Qt::black));
+    callableRect->setFlag(QGraphicsItem::ItemIsMovable);
+    callableRect->setFlag(QGraphicsItem::ItemSendsGeometryChanges);
+
+    scene->addItem(callableRect);
+
+    const ShapeData shapeData(callableRect, str, true, x, y);
+    items.push_back(shapeData);
 }
 
 void MainWindow::createCircle(int x, int y, int radius, const QString& str)
@@ -131,10 +150,100 @@ void MainWindow::createCircle(int x, int y, int radius, const QString& str)
     int green = dist(twister);
     int blue = dist(twister);
 
-    auto circle = scene->addEllipse(x, y, radius, radius, QPen(Qt::black), QBrush(QColor(red, green, blue)));
-    circle->setFlag(QGraphicsItem::ItemIsMovable);
-    items.push_back({circle, false, str});
-    shapeTypes.push_back(1);
+    auto callableCircle = new CallableGraphicsCircleItem(x, y, radius, str, this);
+
+    callableCircle->setBrush(QBrush(QColor(red, green, blue)));
+    //callableCircle->setPen(QPen(Qt::black));
+    callableCircle->setFlag(QGraphicsItem::ItemIsMovable);
+    callableCircle->setFlag(QGraphicsItem::ItemSendsGeometryChanges);
+
+    scene->addItem(callableCircle);
+
+    const ShapeData shapeData(callableCircle, str, false, x, y);
+    items.push_back(shapeData);
+}
+
+void MainWindow::resetEdits()
+{
+    ui->upperYEdit->clear();
+    ui->leftXEdit->clear();
+    ui->widthEdit->clear();
+    ui->heightEdit->clear();
+    ui->shapeNameEdit->clear();
+}
+
+void MainWindow::updateEdits(QAbstractGraphicsShapeItem* item)
+{
+    for (int i =0; i < items.size(); ++i)
+    {
+        if (items[i].shape == item)
+        {
+            currentShapeIndex = i;
+            ui->updateShapeButton->setDisabled(false);
+            break;
+        }
+    }
+
+    ui->shapeNameEdit->setText(items[currentShapeIndex].name);
+
+    auto posReal = item->scenePos();
+    auto pos = posReal.toPoint();
+
+    QString coordinate;
+    coordinate.setNum(items[currentShapeIndex].x + (int)pos.x());
+    ui->leftXEdit->setText(coordinate);
+    coordinate.setNum(items[currentShapeIndex].y + (int)pos.y());
+    ui->upperYEdit->setText(coordinate);
+
+
+    auto boundingRectReal = item->sceneBoundingRect();
+    auto boundingRect = boundingRectReal.toRect();
+    ui->widthEdit->setText(QString::number(boundingRect.width()));
+    if (!items[currentShapeIndex].isRect)
+    {
+        ui->heightEdit->setDisabled(true);
+    }
+    else
+    {
+        ui->heightEdit->setDisabled(false);
+        ui->heightEdit->setText(QString::number(boundingRect.height()));
+    }
+}
+
+void MainWindow::onUpdateShapeClicked()
+{
+//    scene->removeItem(items[currentShapeIndex].shape);
+//    delete items[currentShapeIndex].shape;
+//    const int i = currentShapeIndex;
+//    if (items[i].isRect)
+//    {
+//        auto posReal = items[i].shape->pos();
+//        auto pos = posReal.toPoint();
+//        auto boundingRectReal = items[i].shape->boundingRect();
+//        auto boundingRect = boundingRectReal.toRect();
+
+//        createRectangle(pos.x(), pos.y(), boundingRect.width(), boundingRect.height(), items[i].name);
+//    }
+//    items.remove(currentShapeIndex);
+//    currentShapeIndex = items.size() - 1;
+
+}
+
+void MainWindow::deleteItem(QAbstractGraphicsShapeItem *item)
+{
+    for (int i = 0; i < items.size(); ++i)
+    {
+        if (items[i].shape == item)
+        {
+            scene->removeItem(item);
+            delete item;
+            items.remove(i);
+            break;
+        }
+    }
+
+    currentShapeIndex = -1;
+    ui->updateShapeButton->setDisabled(true);
 }
 
 void MainWindow::onMapResizeClicked()
