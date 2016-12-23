@@ -13,11 +13,18 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp\
-        mainwindow.cpp
+        mainwindow.cpp \
+    callbackgraphicsrectitem.cpp \
+    callablegraphicscircleitem.cpp \
+    shapegenerator.cpp
 
 HEADERS  += mainwindow.h \
-    shapedata.h
+    shapedata.h \
+    callbackgraphicsrectitem.h \
+    callablegraphicscircleitem.h \
+    shapegenerator.h
 
 FORMS    += mainwindow.ui
 
-RESOURCES +=
+RESOURCES += \
+    resources.qrc

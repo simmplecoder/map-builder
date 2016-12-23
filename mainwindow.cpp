@@ -7,7 +7,6 @@
 #include <QFile>
 #include <QTextStream>
 #include <QDebug>
-#include <functional>
 #include "callbackgraphicsrectitem.h"
 #include "callablegraphicscircleitem.h"
 
@@ -27,9 +26,8 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->generateButton, SIGNAL(released()), this, SLOT(onGenerateClicked()));
     connect(ui->updateShapeButton, SIGNAL(released()), this, SLOT(onUpdateShapeClicked()));
 
-
-    QIcon rectangleIcon("./assets/rectangle-128.ico");
-    QIcon circleIcon("./assets/circle-128.ico");
+    QIcon rectangleIcon(":/images/assets/rectangle-128.ico");
+    QIcon circleIcon(":/images/assets/circle-128.ico");
 
     QListWidgetItem* item = new QListWidgetItem(rectangleIcon, "Rectangle", nullptr, Shapes::Rectangle);
     ui->ShapesList->addItem(item);
@@ -42,11 +40,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
     scene->setSceneRect(0, 0, mapSize.width() - 20, mapSize.height() - 20);
     ui->graphicsView->setScene(scene);
-    //ui->graphicsView->setSceneRect(0, 0, mapSize.width() - 20, mapSize.height() - 20);
-//    ui->graphicsView->setBackgroundBrush(QBrush(Qt::black));
-
-    qDebug() << ui->graphicsView->scene()->width()
-             << ' ' << ui->graphicsView->scene()->height();
 
     ui->updateShapeButton->setDisabled(true);
 }
