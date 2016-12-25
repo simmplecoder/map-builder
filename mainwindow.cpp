@@ -7,8 +7,6 @@
 #include <QFile>
 #include <QTextStream>
 #include <QDebug>
-#include "callbackgraphicsrectitem.h"
-#include "callablegraphicscircleitem.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -59,8 +57,6 @@ void MainWindow::onSelectedShapeChanged(QListWidgetItem *current, QListWidgetIte
         ui->width->setText("Radius");
         ui->height->setText("Unused");
         ui->heightEdit->setDisabled(true);
-//        ui->height->hide();
-//        ui->heightEdit->hide();
     }
     else
     {
@@ -68,8 +64,6 @@ void MainWindow::onSelectedShapeChanged(QListWidgetItem *current, QListWidgetIte
         ui->upperY->setText("Upper Y");
         ui->width->setText("Width");
         ui->heightEdit->setDisabled(false);
-//        ui->height->show();
-//        ui->heightEdit->show();
         ui->height->setText("Height");
     }
 }
@@ -113,7 +107,6 @@ void MainWindow::onGenerateClicked()
         auto rect = items[i].shape->boundingRect();
         if (items[i].isRect)
         {
-//            stream << rect.width() << ' ' << rect.height() << ' ';
             stream << items[i].width << ' ' << items[i].height << ' ';
         }
         else
@@ -126,16 +119,7 @@ void MainWindow::onGenerateClicked()
 
 void MainWindow::createRectangle(int x, int y, int w, int h, const QString& str)
 {
-    int red = dist(twister);
-    int green = dist(twister);
-    int blue = dist(twister);
-
-    auto callableRect = new CallableGraphicsRectItem(x, y, w, h, str, this);
-
-    callableRect->setBrush(QBrush(QColor(red, green, blue)));
-    //callableRect->setPen(QPen(Qt::black));
-    callableRect->setFlag(QGraphicsItem::ItemIsMovable);
-    callableRect->setFlag(QGraphicsItem::ItemSendsGeometryChanges);
+    auto callableRect = shapeGenerator.createRectangle(QPoint(x, y), w, h, this);
 
     scene->addItem(callableRect);
 
@@ -145,16 +129,7 @@ void MainWindow::createRectangle(int x, int y, int w, int h, const QString& str)
 
 void MainWindow::createCircle(int x, int y, int radius, const QString& str)
 {
-    int red = dist(twister);
-    int green = dist(twister);
-    int blue = dist(twister);
-
-    auto callableCircle = new CallableGraphicsCircleItem(x, y, radius, str, this);
-
-    callableCircle->setBrush(QBrush(QColor(red, green, blue)));
-    //callableCircle->setPen(QPen(Qt::black));
-    callableCircle->setFlag(QGraphicsItem::ItemIsMovable);
-    callableCircle->setFlag(QGraphicsItem::ItemSendsGeometryChanges);
+    auto callableCircle = shapeGenerator.createCircle(QPoint(x, y), radius, this);
 
     scene->addItem(callableCircle);
 
@@ -194,10 +169,6 @@ void MainWindow::updateEdits(QAbstractGraphicsShapeItem* item)
     coordinate.setNum(items[currentShapeIndex].y + (int)pos.y());
     ui->upperYEdit->setText(coordinate);
 
-
-//    auto boundingRectReal = item->sceneBoundingRect();
-//    auto boundingRect = boundingRectReal.toRect();
-//    ui->widthEdit->setText(QString::number(boundingRect.width()));
     ui->widthEdit->setText(QString::number(items[currentShapeIndex].width));
     if (!items[currentShapeIndex].isRect)
     {
@@ -206,7 +177,6 @@ void MainWindow::updateEdits(QAbstractGraphicsShapeItem* item)
     else
     {
         ui->heightEdit->setDisabled(false);
-//        ui->heightEdit->setText(QString::number(boundingRect.height()));
         ui->heightEdit->setText(QString::number(items[currentShapeIndex].height));
     }
 }

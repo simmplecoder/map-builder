@@ -16,13 +16,15 @@ SOURCES += main.cpp\
         mainwindow.cpp \
     callbackgraphicsrectitem.cpp \
     callablegraphicscircleitem.cpp \
-    shapegenerator.cpp
+    shapegenerator.cpp \
+    random_color_generator.cpp
 
 HEADERS  += mainwindow.h \
     shapedata.h \
     callbackgraphicsrectitem.h \
     callablegraphicscircleitem.h \
-    shapegenerator.h
+    shapegenerator.h \
+    random_color_generator.h
 
 FORMS    += mainwindow.ui
 

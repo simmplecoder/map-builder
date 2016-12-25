@@ -5,9 +5,8 @@
 
 CallableGraphicsCircleItem::CallableGraphicsCircleItem(
         int xPos, int yPos, int r,
-        const QString& rectName, MainWindow* p):
+        MainWindow* p):
     QGraphicsEllipseItem(xPos, yPos, r, r),
-    name_(rectName),
     ptr(p),
     isPressed(false)
 {}
@@ -44,10 +43,4 @@ QVariant CallableGraphicsCircleItem::itemChange(GraphicsItemChange change, const
     }
 
     return QGraphicsItem::itemChange(change, value);
-}
-
-
-QString CallableGraphicsCircleItem::name() const
-{
-    return name_;
 }

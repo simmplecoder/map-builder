@@ -6,10 +6,8 @@
 #include <QGraphicsScene>
 #include <QVector>
 #include <QAbstractGraphicsShapeItem>
-#include <random>
 #include "shapedata.h"
-#include "callablegraphicscircleitem.h"
-#include "callbackgraphicsrectitem.h"
+#include "shapegenerator.h"
 
 namespace Ui {
 class MainWindow;
@@ -41,6 +39,8 @@ private:
     int currentWidth;
     int currentHeight;
     int currentShapeIndex;
+    ShapeGenerator shapeGenerator;
+
 private:
     enum Shapes : int {Rectangle, Circle};
 

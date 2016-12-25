@@ -4,10 +4,9 @@
 
 CallableGraphicsRectItem::CallableGraphicsRectItem(
         int xPos, int yPos,
-        int rectWidth, int rectHeight, QString rectName,
+        int rectWidth, int rectHeight,
         MainWindow* p):
     QGraphicsRectItem(xPos, yPos, rectWidth, rectHeight),
-    name_(rectName),
     ptr(p)
 {}
 
@@ -42,9 +41,4 @@ QVariant CallableGraphicsRectItem::itemChange(GraphicsItemChange change, const Q
     }
 
     return QGraphicsItem::itemChange(change, value);
-}
-
-QString CallableGraphicsRectItem::name() const
-{
-    return name_;
 }
