@@ -2,15 +2,13 @@
 #define SHAPEDATA_H
 
 #include <QAbstractGraphicsShapeItem>
-#include <QString>
 
 struct ShapeData
 {
     ShapeData() = default;
-    ShapeData(QAbstractGraphicsShapeItem* shape_, QString shapeName, bool isRect_,
+    ShapeData(QAbstractGraphicsShapeItem* shape_, bool isRect_,
               int x_, int y_, int width_, int height_):
         shape(shape_),
-        name(shapeName),
         isRect(isRect_),
         x(x_),
         y(y_),
@@ -19,7 +17,6 @@ struct ShapeData
     {}
 
     QAbstractGraphicsShapeItem* shape;
-    QString name;
     bool isRect;
     int x;
     int y;

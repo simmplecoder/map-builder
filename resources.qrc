@@ -2,5 +2,6 @@
     <qresource prefix="/images">
         <file>assets/circle-128.ico</file>
         <file>assets/rectangle-128.ico</file>
+        <file>assets/save-128.png</file>
     </qresource>
 </RCC>

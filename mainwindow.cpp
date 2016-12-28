@@ -7,39 +7,38 @@
 #include <QFile>
 #include <QTextStream>
 #include <QDebug>
+#include <QImage>
+#include <QPainter>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::MainWindow),
-    dist(0, 255),
-    currentWidth(1024),
-    currentHeight(768)
+    ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
 
-    connect(ui->ShapesList, SIGNAL(currentItemChanged(QListWidgetItem*,QListWidgetItem*)),
-            this, SLOT(onSelectedShapeChanged(QListWidgetItem*,QListWidgetItem*)));
+    connect(ui->shapeList, SIGNAL(currentIndexChanged(int)), this,
+            SLOT(onSelectedShapeChanged(int)));
     connect(ui->createShapeButton, SIGNAL(released()), this, SLOT(onCreateClicked()));
-    connect(ui->resizeMapButton, SIGNAL(released()), this, SLOT(onMapResizeClicked()));
-    connect(ui->generateButton, SIGNAL(released()), this, SLOT(onGenerateClicked()));
     connect(ui->updateShapeButton, SIGNAL(released()), this, SLOT(onUpdateShapeClicked()));
 
     QIcon rectangleIcon(":/images/assets/rectangle-128.ico");
     QIcon circleIcon(":/images/assets/circle-128.ico");
 
-    QListWidgetItem* item = new QListWidgetItem(rectangleIcon, "Rectangle", nullptr, Shapes::Rectangle);
-    ui->ShapesList->addItem(item);
+    ui->shapeList->setItemIcon(1, rectangleIcon);
+    ui->shapeList->setItemIcon(2, circleIcon);
 
-    item = new QListWidgetItem(circleIcon, "Circle", nullptr, Shapes::Circle);
-    ui->ShapesList->addItem(item);
+    ui->dockWidget->setGeometry(0, 0, 260, 310);
 
-    scene = new QGraphicsScene(ui->mapBg);
-    auto mapSize = ui->mapBg->size();
+    scene = new QGraphicsScene(this);
+    auto mapSize = ui->graphicsView->size();
 
     scene->setSceneRect(0, 0, mapSize.width() - 20, mapSize.height() - 20);
     ui->graphicsView->setScene(scene);
 
     ui->updateShapeButton->setDisabled(true);
+
+    //disable everything since no shape is selected
+
 }
 
 MainWindow::~MainWindow()
@@ -47,42 +46,53 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::onSelectedShapeChanged(QListWidgetItem *current, QListWidgetItem *previous)
+void MainWindow::onSelectedShapeChanged(int index)
 {
-    (void)previous;
-    if (current->type() == Shapes::Circle)
+    switch (index)
     {
-        ui->leftX->setText("X");
-        ui->upperY->setText("Y");
+    case Shapes::Circle:
+    {
+        ui->positionType->setText("Center");
         ui->width->setText("Radius");
         ui->height->setText("Unused");
         ui->heightEdit->setDisabled(true);
+        break;
     }
-    else
+
+    case Shapes::Rectangle:
     {
-        ui->leftX->setText("Left X");
-        ui->upperY->setText("Upper Y");
+        ui->positionType->setText("Upper left corner");
         ui->width->setText("Width");
         ui->heightEdit->setDisabled(false);
         ui->height->setText("Height");
     }
+        break;
+    default:
+    {
+        ui->createShapeButton->setDisabled(true);
+        return;
+    }
+    }
+    ui->createShapeButton->setDisabled(false);
 }
 
 void MainWindow::onCreateClicked()
 {
     int x = ui->leftXEdit->text().toInt();
     int y = ui->upperYEdit->text().toInt();
-    QString name = ui->shapeNameEdit->text();
-    if (ui->ShapesList->currentItem()->type() == Rectangle)
+
+    int index = ui->shapeList->currentIndex();
+
+    if (index == Shapes::Rectangle)
     {
-        int w = ui->widthEdit->text().toInt();
+        int w = ui->heightEdit->text().toInt();
         int h = ui->heightEdit->text().toInt();
-        createRectangle(x, y, w, h, name);
+        createRectangle(x, y, w, h);
     }
-    else
+    else if (index == Shapes::Circle)
     {
         int radius = ui->widthEdit->text().toInt();
-        createCircle(x, y, radius, name);
+        createCircle(x, y, radius);
     }
 
     currentShapeIndex = items.size() - 1;
@@ -91,49 +101,38 @@ void MainWindow::onCreateClicked()
 
 void MainWindow::onGenerateClicked()
 {
-    QFile file("Shapes.txt");
-    if (!file.open(QIODevice::WriteOnly))
-    {
-        qDebug() << "shapes.txt opening failed, aborting\n";
-        return;
-    }
+    auto savedFocusItem = scene->focusItem();
+    scene->clearFocus();
 
-    QTextStream stream(&file);
+    int width = scene->width();
+    int height = scene->height();
 
-    for (int i = 0; i < items.size(); ++i)
-    {
-        auto pos = items[i].shape->pos();
-        stream << items[i].x + pos.x() << ' ' << items[i].y + pos.y() << ' ';
-        auto rect = items[i].shape->boundingRect();
-        if (items[i].isRect)
-        {
-            stream << items[i].width << ' ' << items[i].height << ' ';
-        }
-        else
-        {
-            stream << rect.width() << ' ';
-        }
-        stream << items[i].name << '\n';
-    }
+    QImage generatedMap(width, height, QImage::Format::Format_RGB16);
+    generatedMap.fill(Qt::transparent);
+
+    QPainter painter(&generatedMap);
+    scene->render(&painter);
+    generatedMap.save("Shapes.png");
+    scene->setFocusItem(savedFocusItem);
 }
 
-void MainWindow::createRectangle(int x, int y, int w, int h, const QString& str)
+void MainWindow::createRectangle(int x, int y, int w, int h)
 {
     auto callableRect = shapeGenerator.createRectangle(QPoint(x, y), w, h, this);
 
     scene->addItem(callableRect);
 
-    const ShapeData shapeData(callableRect, str, true, x, y, w, h);
+    const ShapeData shapeData(callableRect, true, x, y, w, h);
     items.push_back(shapeData);
 }
 
-void MainWindow::createCircle(int x, int y, int radius, const QString& str)
+void MainWindow::createCircle(int x, int y, int radius)
 {
     auto callableCircle = shapeGenerator.createCircle(QPoint(x, y), radius, this);
 
     scene->addItem(callableCircle);
 
-    const ShapeData shapeData(callableCircle, str, false, x, y, radius, radius);
+    const ShapeData shapeData(callableCircle, false, x, y, radius, radius);
     items.push_back(shapeData);
 }
 
@@ -143,7 +142,6 @@ void MainWindow::resetEdits()
     ui->leftXEdit->clear();
     ui->widthEdit->clear();
     ui->heightEdit->clear();
-    ui->shapeNameEdit->clear();
 }
 
 void MainWindow::updateEdits(QAbstractGraphicsShapeItem* item)
@@ -157,8 +155,6 @@ void MainWindow::updateEdits(QAbstractGraphicsShapeItem* item)
             break;
         }
     }
-
-    ui->shapeNameEdit->setText(items[currentShapeIndex].name);
 
     auto posReal = item->scenePos();
     auto pos = posReal.toPoint();
@@ -205,24 +201,4 @@ void MainWindow::deleteItem(QAbstractGraphicsShapeItem *item)
 
     currentShapeIndex = items.size() - 1;
     ui->updateShapeButton->setDisabled(true);
-}
-
-void MainWindow::onMapResizeClicked()
-{
-    int newWidth = ui->mapWidthEdit->text().toInt();
-    int newHeight = ui->mapHeightEdit->text().toInt();
-    scene->setSceneRect(0, 0, newWidth, newHeight);
-    currentWidth = newWidth;
-    currentHeight = newHeight;
-
-    for (int i = 0; i < items.size(); ++i)
-    {
-        auto pos = items[i].shape->pos();
-        if (pos.x() > currentWidth || pos.y() > currentHeight)
-        {
-            scene->removeItem(items[i].shape);
-            delete items[i].shape;
-            items.remove(i);
-        }
-    }
 }

@@ -24,9 +24,8 @@ public:
     void updateEdits(QAbstractGraphicsShapeItem* item);
     void deleteItem(QAbstractGraphicsShapeItem* item);
 public slots:
-    void onSelectedShapeChanged(QListWidgetItem* current, QListWidgetItem* previous);
+    void onSelectedShapeChanged(int index);
     void onCreateClicked();
-    void onMapResizeClicked();
     void onGenerateClicked();
     void onUpdateShapeClicked();
 
@@ -34,18 +33,22 @@ private:
     Ui::MainWindow* ui;
     QGraphicsScene* scene;
     QVector<ShapeData> items;
-    std::mt19937 twister;
-    std::uniform_int_distribution<> dist;
-    int currentWidth;
-    int currentHeight;
     int currentShapeIndex;
     ShapeGenerator shapeGenerator;
 
 private:
-    enum Shapes : int {Rectangle, Circle};
+    /*
+    Harcode the values starting from 1
+    since QCombobx
+    has "select item ..." as first element
+    */
+    enum Shapes : int {
+        Rectangle = 1,
+        Circle = 2
+    };
 
-    void createRectangle(int x, int y, int w, int h, const QString& str);
-    void createCircle(int x, int y, int radius, const QString& str);
+    void createRectangle(int x, int y, int w, int h);
+    void createCircle(int x, int y, int radius);
 
     void resetEdits();
 
