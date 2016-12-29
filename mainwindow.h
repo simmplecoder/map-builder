@@ -27,6 +27,7 @@ public slots:
     void onSelectedShapeChanged(int index);
     void onCreateClicked();
     void onGenerateClicked();
+    void onGenerateAsClicked();
     void onUpdateShapeClicked();
 
 private:

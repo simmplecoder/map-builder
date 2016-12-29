@@ -17,16 +17,19 @@ SOURCES += main.cpp\
     callbackgraphicsrectitem.cpp \
     callablegraphicscircleitem.cpp \
     shapegenerator.cpp \
-    random_color_generator.cpp
+    random_color_generator.cpp \
+    generateasdialog.cpp
 
 HEADERS  += mainwindow.h \
     shapedata.h \
     callbackgraphicsrectitem.h \
     callablegraphicscircleitem.h \
     shapegenerator.h \
-    random_color_generator.h
+    random_color_generator.h \
+    generateasdialog.h
 
-FORMS    += mainwindow.ui
+FORMS    += mainwindow.ui \
+    generateasdialog.ui
 
 RESOURCES += \
     resources.qrc

@@ -9,6 +9,7 @@
 #include <QDebug>
 #include <QImage>
 #include <QPainter>
+#include "generateasdialog.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -20,6 +21,9 @@ MainWindow::MainWindow(QWidget *parent) :
             SLOT(onSelectedShapeChanged(int)));
     connect(ui->createShapeButton, SIGNAL(released()), this, SLOT(onCreateClicked()));
     connect(ui->updateShapeButton, SIGNAL(released()), this, SLOT(onUpdateShapeClicked()));
+    connect(ui->actionGenerate, SIGNAL(triggered(bool)), this, SLOT(onGenerateClicked()));
+    connect(ui->actionGenerateAs, SIGNAL(triggered(bool)), this, SLOT(onGenerateAsClicked()));
+
 
     QIcon rectangleIcon(":/images/assets/rectangle-128.ico");
     QIcon circleIcon(":/images/assets/circle-128.ico");
@@ -27,7 +31,11 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->shapeList->setItemIcon(1, rectangleIcon);
     ui->shapeList->setItemIcon(2, circleIcon);
 
-    ui->dockWidget->setGeometry(0, 0, 260, 310);
+    auto validator = new QIntValidator(0, 999999, this);
+    ui->leftXEdit->setValidator(validator);
+    ui->upperYEdit->setValidator(validator);
+    ui->widthEdit->setValidator(validator);
+    ui->heightEdit->setValidator(validator);
 
     scene = new QGraphicsScene(this);
     auto mapSize = ui->graphicsView->size();
@@ -114,6 +122,12 @@ void MainWindow::onGenerateClicked()
     scene->render(&painter);
     generatedMap.save("Shapes.png");
     scene->setFocusItem(savedFocusItem);
+}
+
+void MainWindow::onGenerateAsClicked()
+{
+    auto generateAsDialog = new GenerateAsDialog(scene, this);
+    generateAsDialog->exec();
 }
 
 void MainWindow::createRectangle(int x, int y, int w, int h)

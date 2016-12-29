@@ -48,11 +48,6 @@
      <set>QPainter::HighQualityAntialiasing</set>
     </property>
    </widget>
-   <zorder>graphicsView</zorder>
-   <zorder></zorder>
-   <zorder></zorder>
-   <zorder>verticalLayoutWidget</zorder>
-   <zorder>dockWidget</zorder>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
@@ -67,8 +62,8 @@
     <property name="title">
      <string>File</string>
     </property>
-    <addaction name="actionSave"/>
-    <addaction name="actionSave_as"/>
+    <addaction name="actionGenerate"/>
+    <addaction name="actionGenerateAs"/>
    </widget>
    <widget class="QMenu" name="menuSettings">
     <property name="title">
@@ -229,8 +224,14 @@
             <property name="inputMethodHints">
              <set>Qt::ImhDigitsOnly</set>
             </property>
+            <property name="inputMask">
+             <string/>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
             <property name="maxLength">
-             <number>20</number>
+             <number>6</number>
             </property>
             <property name="cursorMoveStyle">
              <enum>Qt::LogicalMoveStyle</enum>
@@ -275,7 +276,7 @@
              <set>Qt::ImhDigitsOnly</set>
             </property>
             <property name="maxLength">
-             <number>20</number>
+             <number>6</number>
             </property>
            </widget>
           </item>
@@ -321,7 +322,7 @@
              <set>Qt::ImhDigitsOnly</set>
             </property>
             <property name="maxLength">
-             <number>20</number>
+             <number>6</number>
             </property>
            </widget>
           </item>
@@ -363,7 +364,7 @@
              <set>Qt::ImhDigitsOnly</set>
             </property>
             <property name="maxLength">
-             <number>20</number>
+             <number>6</number>
             </property>
            </widget>
           </item>
@@ -395,13 +396,13 @@
     </widget>
    </widget>
   </widget>
-  <action name="actionSave">
+  <action name="actionGenerate">
    <property name="icon">
-    <iconset resource="resources.qrc">
+    <iconset>
      <normaloff>:/images/assets/save-128.png</normaloff>:/images/assets/save-128.png</iconset>
    </property>
    <property name="text">
-    <string>Save</string>
+    <string>Generate</string>
    </property>
   </action>
   <action name="actionMap_size">
@@ -409,15 +410,13 @@
     <string>Map size</string>
    </property>
   </action>
-  <action name="actionSave_as">
+  <action name="actionGenerateAs">
    <property name="text">
-    <string>Save as</string>
+    <string>Generate as</string>
    </property>
   </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
- <resources>
-  <include location="resources.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>
