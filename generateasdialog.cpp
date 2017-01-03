@@ -1,5 +1,7 @@
 #include "generateasdialog.h"
 #include "ui_generateasdialog.h"
+#include <QGraphicsScene>
+#include <QString>
 #include <QPainter>
 #include <QImage>
 

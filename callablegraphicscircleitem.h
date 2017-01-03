@@ -1,6 +1,7 @@
 #ifndef CALLABLEGRAPHICSCIRCLEITEM_H
 #define CALLABLEGRAPHICSCIRCLEITEM_H
-#include <QGraphicsRectItem>
+
+#include <QGraphicsEllipseItem>
 #include <QString>
 
 class MainWindow;
@@ -11,12 +12,10 @@ private:
     MainWindow* ptr;
     bool isPressed;
 public:
-
     CallableGraphicsCircleItem(int xPos, int yPos, int r,
             MainWindow* p);
 
     virtual void mousePressEvent(QGraphicsSceneMouseEvent* event) override;
-
     virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent* event) override;
     virtual QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
 

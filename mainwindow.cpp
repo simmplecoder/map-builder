@@ -10,6 +10,7 @@
 #include <QImage>
 #include <QPainter>
 #include "generateasdialog.h"
+#include "mapresizedialog.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -23,6 +24,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->updateShapeButton, SIGNAL(released()), this, SLOT(onUpdateShapeClicked()));
     connect(ui->actionGenerate, SIGNAL(triggered(bool)), this, SLOT(onGenerateClicked()));
     connect(ui->actionGenerateAs, SIGNAL(triggered(bool)), this, SLOT(onGenerateAsClicked()));
+    connect(ui->actionMap_size, SIGNAL(triggered(bool)), this, SLOT(onResizeMapClicked()));
 
 
     QIcon rectangleIcon(":/images/assets/rectangle-128.ico");
@@ -130,6 +132,14 @@ void MainWindow::onGenerateAsClicked()
     generateAsDialog->exec();
 }
 
+void MainWindow::onResizeMapClicked()
+{
+    auto callback = std::bind(&MainWindow::resizeMap, this, std::placeholders::_1, std::placeholders::_2);
+    auto mapResizeDialog = new MapResizeDialog(scene->width(), scene->height(), callback);
+
+    mapResizeDialog->exec();
+}
+
 void MainWindow::createRectangle(int x, int y, int w, int h)
 {
     auto callableRect = shapeGenerator.createRectangle(QPoint(x, y), w, h, this);
@@ -215,4 +225,26 @@ void MainWindow::deleteItem(QAbstractGraphicsShapeItem *item)
 
     currentShapeIndex = items.size() - 1;
     ui->updateShapeButton->setDisabled(true);
+}
+
+void MainWindow::resizeMap(int newWidth, int newHeight)
+{
+    scene->setSceneRect(0, 0, newWidth, newHeight);
+
+    for (int i = 0; i < items.size(); ++i)
+    {
+        auto pos = items[i].shape->pos();
+        if (pos.x() > newWidth || pos.y() > newHeight)
+        {
+            scene->removeItem(items[i].shape);
+            delete items[i].shape;
+            items.remove(i);
+        }
+    }
+
+    setMaximumWidth(newWidth);
+    setMaximumHeight(newHeight);
+
+    ui->graphicsView->setGeometry(0, 0, newWidth, newHeight + 20);
+    ui->centralWidget->setGeometry(0, 0, newWidth, newHeight + 20);
 }

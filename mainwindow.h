@@ -29,6 +29,7 @@ public slots:
     void onGenerateClicked();
     void onGenerateAsClicked();
     void onUpdateShapeClicked();
+    void onResizeMapClicked();
 
 private:
     Ui::MainWindow* ui;
@@ -48,6 +49,7 @@ private:
         Circle = 2
     };
 
+    void resizeMap(int newWidth, int newHeight);
     void createRectangle(int x, int y, int w, int h);
     void createCircle(int x, int y, int radius);
 

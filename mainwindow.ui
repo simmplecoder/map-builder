@@ -404,6 +404,9 @@
    <property name="text">
     <string>Generate</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+M, Ctrl+G</string>
+   </property>
   </action>
   <action name="actionMap_size">
    <property name="text">
@@ -413,6 +416,9 @@
   <action name="actionGenerateAs">
    <property name="text">
     <string>Generate as</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+M, Shift+G</string>
    </property>
   </action>
  </widget>

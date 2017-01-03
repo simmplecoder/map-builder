@@ -1,5 +1,6 @@
 #include "callbackgraphicsrectitem.h"
 #include <QGraphicsSceneMouseEvent>
+#include <QGraphicsRectItem>
 #include "mainwindow.h"
 
 CallableGraphicsRectItem::CallableGraphicsRectItem(

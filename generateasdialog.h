@@ -2,8 +2,8 @@
 #define GENERATEASDIALOG_H
 
 #include <QDialog>
-#include <QGraphicsScene>
-#include <QString>
+
+class QGraphicsScene;
 
 namespace Ui {
 class GenerateAsDialog;

@@ -11,6 +11,7 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = map_builder
 TEMPLATE = app
 
+CONFIG +=c++11
 
 SOURCES += main.cpp\
         mainwindow.cpp \
@@ -18,7 +19,8 @@ SOURCES += main.cpp\
     callablegraphicscircleitem.cpp \
     shapegenerator.cpp \
     random_color_generator.cpp \
-    generateasdialog.cpp
+    generateasdialog.cpp \
+    mapresizedialog.cpp
 
 HEADERS  += mainwindow.h \
     shapedata.h \
@@ -26,10 +28,12 @@ HEADERS  += mainwindow.h \
     callablegraphicscircleitem.h \
     shapegenerator.h \
     random_color_generator.h \
-    generateasdialog.h
+    generateasdialog.h \
+    mapresizedialog.h
 
 FORMS    += mainwindow.ui \
-    generateasdialog.ui
+    generateasdialog.ui \
+    mapresizedialog.ui
 
 RESOURCES += \
     resources.qrc
