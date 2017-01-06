@@ -191,21 +191,17 @@ void MainWindow::onAnotherShapeFocused(QGraphicsItem *newFocusItem, QGraphicsIte
     (void)oldFocusItem; //not needed
     (void)reason; //not needed;
 
-    ui->shapeList->setCurrentIndex(1 + items[currentShapeIndex].isRect);
-
-    if (items[currentShapeIndex].shape != newFocusItem)
+    for (int i =0; i < items.size(); ++i)
     {
-        for (int i =0; i < items.size(); ++i)
+        if (items[i].shape == newFocusItem)
         {
-            if (items[i].shape == newFocusItem)
-            {
-                currentShapeIndex = i;
-                ui->updateShapeButton->setDisabled(false);
-                break;
-            }
+            currentShapeIndex = i;
+            ui->updateShapeButton->setDisabled(false);
+            break;
         }
     }
 
+    ui->shapeList->setCurrentIndex(1 + items[currentShapeIndex].isRect);
     ui->widthEdit->setText(QString::number(items[currentShapeIndex].width));
     if (!items[currentShapeIndex].isRect)
     {

@@ -27,4 +27,5 @@ void ShapeGenerator::postprocess(QAbstractGraphicsShapeItem *shape)
     shape->setBrush(QBrush(gen()));
     shape->setFlag(QGraphicsItem::ItemIsMovable);
     shape->setFlag(QGraphicsItem::ItemSendsGeometryChanges);
+    shape->setFlag(QGraphicsItem::ItemIsFocusable);
 }
