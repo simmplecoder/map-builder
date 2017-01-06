@@ -9,6 +9,7 @@
 #include <QDebug>
 #include <QImage>
 #include <QPainter>
+#include <QResizeEvent>
 #include "generateasdialog.h"
 #include "mapresizedialog.h"
 
@@ -27,23 +28,30 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->actionMap_size, SIGNAL(triggered(bool)), this, SLOT(onResizeMapClicked()));
 
 
+
+
     QIcon rectangleIcon(":/images/assets/rectangle-128.ico");
     QIcon circleIcon(":/images/assets/circle-128.ico");
 
-    ui->shapeList->setItemIcon(1, rectangleIcon);
-    ui->shapeList->setItemIcon(2, circleIcon);
+    ui->shapeList->setItemIcon(Shapes::Rectangle, rectangleIcon);
+    ui->shapeList->setItemIcon(Shapes::Circle, circleIcon);
 
-    auto validator = new QIntValidator(0, 999999, this);
-    ui->leftXEdit->setValidator(validator);
-    ui->upperYEdit->setValidator(validator);
-    ui->widthEdit->setValidator(validator);
-    ui->heightEdit->setValidator(validator);
+    auto posValidator = new QIntValidator(0, 999999, this);
+    ui->leftXEdit->setValidator(posValidator);
+    ui->upperYEdit->setValidator(posValidator);
+
+    auto sizeValidator = new QIntValidator(1, 999999, this);
+    ui->widthEdit->setValidator(sizeValidator);
+    ui->heightEdit->setValidator(sizeValidator);
 
     scene = new QGraphicsScene(this);
     auto mapSize = ui->graphicsView->size();
 
-    scene->setSceneRect(0, 0, mapSize.width() - 20, mapSize.height() - 20);
+    scene->setSceneRect(0, 0, mapSize.width(), mapSize.height());
     ui->graphicsView->setScene(scene);
+
+    connect(scene, SIGNAL(focusItemChanged(QGraphicsItem*,QGraphicsItem*,Qt::FocusReason)),
+            this, SLOT(onAnotherShapeFocused(QGraphicsItem*,QGraphicsItem*,Qt::FocusReason)));
 
     ui->updateShapeButton->setDisabled(true);
 
@@ -54,6 +62,14 @@ MainWindow::MainWindow(QWidget *parent) :
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+void MainWindow::resizeEvent(QResizeEvent *event)
+{
+    QMainWindow::resizeEvent(event);
+
+//    auto newSize = event->size();
+//    ui->graphicsView->setGeometry(0, 0, newSize.width(), newSize.height());
 }
 
 void MainWindow::onSelectedShapeChanged(int index)
@@ -95,7 +111,7 @@ void MainWindow::onCreateClicked()
 
     if (index == Shapes::Rectangle)
     {
-        int w = ui->heightEdit->text().toInt();
+        int w = ui->widthEdit->text().toInt();
         int h = ui->heightEdit->text().toInt();
         createRectangle(x, y, w, h);
     }
@@ -107,6 +123,8 @@ void MainWindow::onCreateClicked()
 
     currentShapeIndex = items.size() - 1;
     ui->updateShapeButton->setDisabled(false);
+    auto currentShape = items[currentShapeIndex].shape;
+    scene->setFocusItem(currentShape);
 }
 
 void MainWindow::onGenerateClicked()
@@ -168,26 +186,25 @@ void MainWindow::resetEdits()
     ui->heightEdit->clear();
 }
 
-void MainWindow::updateEdits(QAbstractGraphicsShapeItem* item)
+void MainWindow::onAnotherShapeFocused(QGraphicsItem *newFocusItem, QGraphicsItem *oldFocusItem, Qt::FocusReason reason)
 {
-    for (int i =0; i < items.size(); ++i)
+    (void)oldFocusItem; //not needed
+    (void)reason; //not needed;
+
+    ui->shapeList->setCurrentIndex(1 + items[currentShapeIndex].isRect);
+
+    if (items[currentShapeIndex].shape != newFocusItem)
     {
-        if (items[i].shape == item)
+        for (int i =0; i < items.size(); ++i)
         {
-            currentShapeIndex = i;
-            ui->updateShapeButton->setDisabled(false);
-            break;
+            if (items[i].shape == newFocusItem)
+            {
+                currentShapeIndex = i;
+                ui->updateShapeButton->setDisabled(false);
+                break;
+            }
         }
     }
-
-    auto posReal = item->scenePos();
-    auto pos = posReal.toPoint();
-
-    QString coordinate;
-    coordinate.setNum(items[currentShapeIndex].x + (int)pos.x());
-    ui->leftXEdit->setText(coordinate);
-    coordinate.setNum(items[currentShapeIndex].y + (int)pos.y());
-    ui->upperYEdit->setText(coordinate);
 
     ui->widthEdit->setText(QString::number(items[currentShapeIndex].width));
     if (!items[currentShapeIndex].isRect)
@@ -199,6 +216,18 @@ void MainWindow::updateEdits(QAbstractGraphicsShapeItem* item)
         ui->heightEdit->setDisabled(false);
         ui->heightEdit->setText(QString::number(items[currentShapeIndex].height));
     }
+}
+
+void MainWindow::updateEdits(QAbstractGraphicsShapeItem* item)
+{
+    auto posReal = item->scenePos();
+    auto pos = posReal.toPoint();
+
+    QString coordinate;
+    coordinate.setNum(items[currentShapeIndex].x + (int)pos.x());
+    ui->leftXEdit->setText(coordinate);
+    coordinate.setNum(items[currentShapeIndex].y + (int)pos.y());
+    ui->upperYEdit->setText(coordinate);
 }
 
 void MainWindow::onUpdateShapeClicked()

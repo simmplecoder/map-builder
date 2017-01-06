@@ -30,6 +30,7 @@ public slots:
     void onGenerateAsClicked();
     void onUpdateShapeClicked();
     void onResizeMapClicked();
+    void onAnotherShapeFocused(QGraphicsItem *newFocusItem, QGraphicsItem *oldFocusItem, Qt::FocusReason reason);
 
 private:
     Ui::MainWindow* ui;
@@ -45,13 +46,14 @@ private:
     has "select item ..." as first element
     */
     enum Shapes : int {
-        Rectangle = 1,
-        Circle = 2
+        Circle = 1,
+        Rectangle = 2
     };
 
     void resizeMap(int newWidth, int newHeight);
     void createRectangle(int x, int y, int w, int h);
     void createCircle(int x, int y, int radius);
+    void resizeEvent(QResizeEvent *event) override;
 
     void resetEdits();
 

@@ -45,7 +45,7 @@
      </brush>
     </property>
     <property name="renderHints">
-     <set>QPainter::HighQualityAntialiasing</set>
+     <set>QPainter::Antialiasing</set>
     </property>
    </widget>
   </widget>
@@ -149,12 +149,12 @@
         </item>
         <item>
          <property name="text">
-          <string>Rectangle</string>
+          <string>Circle</string>
          </property>
         </item>
         <item>
          <property name="text">
-          <string>Circle</string>
+          <string>Rectangle</string>
          </property>
         </item>
        </widget>
@@ -398,7 +398,7 @@
   </widget>
   <action name="actionGenerate">
    <property name="icon">
-    <iconset>
+    <iconset resource="resources.qrc">
      <normaloff>:/images/assets/save-128.png</normaloff>:/images/assets/save-128.png</iconset>
    </property>
    <property name="text">
@@ -423,6 +423,8 @@
   </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
- <resources/>
+ <resources>
+  <include location="resources.qrc"/>
+ </resources>
  <connections/>
 </ui>
